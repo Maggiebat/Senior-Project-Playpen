@@ -43,6 +43,10 @@ class ChessGUI:
         # Bind click events to the board
         self.canvas.bind("<Button-1>", self.on_square_click)
 
+        # Creates a button that prints the board state **debug feature**
+        print_button = tk.Button(self.root, text="Print Board State", command=self.print_board_state)
+        print_button.pack()
+
         # Makes it so you can hit Escape to leave the game
         self.root.bind("<Escape>", lambda event: self.quit_game())
 
@@ -94,6 +98,7 @@ class ChessGUI:
         print("Board has been reset to initial state with all pieces visible.")
 
 
+    # Loads the photos so that the GUI has chess pieces on the board
     def load_piece_images(self):
         """Load piece images from files (you can use any chess piece images here)."""
         pieces = ["wp", "wr", "wn", "wb", "wq", "wk", "bp", "br", "bn", "bb", "bq", "bk"]
@@ -104,7 +109,7 @@ class ChessGUI:
 
     def draw_board(self):
         """Draw the chessboard on the canvas."""
-        colors = ["#DDB88C", "#A66D4F"]  # Light and dark squares
+        colors = ["#f5ffff", "#363838"]  # Light and dark squares
         for row in range(self.board_size):
             for col in range(self.board_size):
                 color = colors[(row + col) % 2]
