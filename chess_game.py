@@ -50,7 +50,8 @@ class ChessGUI:
         self.is_player_turn = True  # Player starts
 
         # Initialize Stockfish engine
-        self.engine = chess.engine.SimpleEngine.popen_uci("C:\Users\Maggi\OneDrive\Documents\UMASSD\Fall24\CIS 498")  # Update this to your Stockfish path
+        self.engine = chess.engine.SimpleEngine.popen_uci("C:\\Users\\Maggi\\OneDrive\\Documents\\UMASSD\\Fall24\\CIS 498\\Senior Project Playpen\\stockfish-windows-x86-64-avx2.exe")
+
 
     def load_piece_images(self):
         """Load piece images from files (you can use any chess piece images here)."""
