@@ -43,6 +43,9 @@ class ChessGUI:
         # Bind click events to the board
         self.canvas.bind("<Button-1>", self.on_square_click)
 
+        # Makes it so you can hit Escape to leave the game
+        self.root.bind("<Escape>", lambda event: self.quit_game())
+
         # Track selected square and moves
         self.selected_square = None
 
@@ -51,6 +54,44 @@ class ChessGUI:
 
         # Initialize Stockfish engine
         self.engine = chess.engine.SimpleEngine.popen_uci("C:\\Users\\Maggi\\OneDrive\\Documents\\UMASSD\\Fall24\\CIS 498\\Senior Project Playpen\\stockfish-windows-x86-64-avx2.exe")
+
+    def quit_game(self):
+        # Resets the SQL table
+        self.reset_board()
+        # Close the Stockfish engine
+        self.engine.quit()
+        # Close the MySQL connection
+        self.connection.close()
+        # Close the GUI window
+        self.root.quit()
+        print("Game ended")
+
+    def reset_board(self):
+        # Delete all existing rows in the chess table
+        self.cursor.execute("TRUNCATE TABLE chess")
+
+        # Repopulate the table with the initial chessboard setup and set visible to TRUE
+        initial_setup = [
+            ('A', 1, 'WR1', False, True), ('B', 1, 'WN', False, True), ('C', 1, 'WB', False, True),
+            ('D', 1, 'WQ', False, True), ('E', 1, 'WK', False, True), ('F', 1, 'WB', False, True),
+            ('G', 1, 'WN', False, True), ('H', 1, 'WR2', False, True),
+            ('A', 2, 'WP1', False, True), ('B', 2, 'WP2', False, True), ('C', 2, 'WP3', False, True),
+            ('D', 2, 'WP4', False, True), ('E', 2, 'WP5', False, True), ('F', 2, 'WP6', False, True),
+            ('G', 2, 'WP7', False, True), ('H', 2, 'WP8', False, True),
+            # Black pieces setup
+            ('A', 8, 'BR1', False, True), ('B', 8, 'BN', False, True), ('C', 8, 'BB', False, True),
+            ('D', 8, 'BQ', False, True), ('E', 8, 'BK', False, True), ('F', 8, 'BB', False, True),
+            ('G', 8, 'BN', False, True), ('H', 8, 'BR2', False, True),
+            ('A', 7, 'BP1', False, True), ('B', 7, 'BP2', False, True), ('C', 7, 'BP3', False, True),
+            ('D', 7, 'BP4', False, True), ('E', 7, 'BP5', False, True), ('F', 7, 'BP6', False, True),
+            ('G', 7, 'BP7', False, True), ('H', 7, 'BP8', False, True)
+        ]
+
+        query = "INSERT INTO chess (`column`, `row`, `piece`, `empty`, `visible`) VALUES (%s, %s, %s, %s, %s)"
+        self.cursor.executemany(query, initial_setup)
+        self.connection.commit()
+
+        print("Board has been reset to initial state with all pieces visible.")
 
 
     def load_piece_images(self):
@@ -179,6 +220,12 @@ class ChessGUI:
         elif self.board.is_check():
             messagebox.showinfo("Check", "Check!")
         return False
+    
+    def print_board_state(self):
+        self.cursor.execute("SELECT * FROM chess;")
+        results = self.cursor.fetchall()
+        for row in results:
+            print(row)
 
     def close(self):
         """Close the Stockfish engine and MySQL connection."""
